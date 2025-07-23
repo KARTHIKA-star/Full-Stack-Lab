@@ -1,0 +1,206 @@
+import React, { useState } from "react";
+const initialUsers = [
+{ username: "alice" },
+{ username: "bob" },
+{ username: "carol" },
+{ username: "dave" },
+];
+const initialPosts = [
+{
+id: 1,
+author: "alice",
+content: "Hello world! My first post!",
+image: null,
+likes: 2,
+comments: [{ id: 1,
+    author: "bob",
+content: "This is Bob's cool pic",
+image: "https://placekitten.com/300/200",
+likes: 5,
+comments: [],
+},
+];
+function App() {
+const [users] = useState(initialUsers);
+const [loggedInUser] = useState(initialUsers[0]); // alice logged in
+const [following, setFollowing] = useState(["bob"]); // alice follows bob initially
+const [posts, setPosts] = useState(initialPosts);
+const [content, setContent] = useState("");
+const [imageFile, setImageFile] = useState(null);
+const [imagePreview, setImagePreview] = useState(null);
+const [commentTexts, setCommentTexts] = useState({});
+const visiblePosts = posts.filter(
+(p) => following.includes(p.author) || p.author === loggedInUser.username
+);
+// Handle image file select
+const handleImageChange = (e) => {
+const file = e.target.files[0];
+if (file) {
+setImageFile(file);
+const previewURL = URL.createObjectURL(file);
+setImagePreview(previewURL);
+} else {
+setImageFile(null);
+setImagePreview(null);
+}
+};
+// Add new post
+const addPost = () => {
+if (!content.trim() && !imageFile) {
+alert("Add content or upload an image!");
+return;
+}
+if (imageFile) {
+// Convert image file to base64 data URL (async)
+const reader = new FileReader();
+reader.onloadend = () => {
+const base64Image = reader.result;
+createPost(base64Image);
+};
+reader.readAsDataURL(imageFile);
+createPost(null);
+}
+};
+const createPost = (imageDataUrl) => {
+const newPost = {
+id: Date.now(),
+author: loggedInUser.username,
+content,
+image: imageDataUrl,
+likes: 0,
+comments: [],
+};
+setPosts([newPost, ...posts]);
+setContent("");
+setImageFile(null);
+setImagePreview(null);
+};
+const toggleLike = (postId) => {
+setPosts(
+posts.map((p) =>
+p.id === postId ? { ...p, likes: p.likes + 1 } : p
+)
+);
+};
+const addComment = (postId) => {
+const text = commentTexts[postId];
+if (!text || !text.trim()) return;
+setPosts(
+posts.map((p) =>
+p.id === postId
+? {
+...p,
+comments: [
+...p.comments,
+{
+id: Date.now(),
+author: loggedInUser.username,
+text: text.trim(),
+},
+],
+}
+: p
+)
+);
+setCommentTexts({ ...commentTexts, [postId]
+    const toggleFollow = (username) => {
+if (following.includes(username)) {
+setFollowing(following.filter((u) => u !== username));
+} else {
+setFollowing([...following, username]);
+}
+};
+return (
+<div className="app">
+<header>
+<h1>Microblog</h1>
+<div className="user-info">Logged in as: @{loggedInUser.username}</div>
+</header>
+<main>
+<section className="post-creator">
+<h2>Create Post</h2>
+<textarea
+placeholder="What's on your mind?"
+value={content}
+onChange={(e) => setContent(e.target.value)}
+rows={3}
+/>
+<input type="file" accept="image/*" onChange={handleImageChange} />
+{imagePreview && (
+<div className="image-preview">
+<img src={imagePreview} alt="preview" />
+<button
+onClick={() => {
+setImageFile(null);
+setImagePreview(null);
+}}
+>
+Remove Image
+</button>
+</div>
+)}
+<button onClick={addPost}>Post</button>
+</section>
+<section className="posts-feed">
+<h2>Timeline</h2>
+{visiblePosts.length === 0 && <p>No posts to show.</p>}
+{visiblePosts.map((post) => (
+<article key={post.id} className="post">
+<div className="post-author">@{post.author}</div>
+<p className="post-content">{post.content}</p
+    const toggleFollow = (username) => {
+if (following.includes(username)) {
+setFollowing(following.filter((u) => u !== username));
+} else {
+setFollowing([...following, username]);
+}
+};
+return (
+<div className="app">
+<header>
+<h1>Microblog</h1>
+<div className="user-info">Logged in as: @{loggedInUser.username}</div>
+</header>
+<main>
+<section className="post-creator">
+<h2>Create Post</h2>
+<textarea
+placeholder="What's on your mind?"
+value={content}
+onChange={(e) => setContent(e.target.value)}
+rows={3}
+/>
+<input type="file" accept="image/*" onChange={handleImageChange} />
+{imagePreview && (
+<div className="image-preview">
+<img src={imagePreview} alt="preview" />
+<button
+onClick={() => {
+setImageFile(null);
+setImagePreview(null);
+}}
+>
+Remove Image
+</button>
+</div>
+)}
+<button onClick={addPost}>Post</button>
+</section>
+<section className="posts-feed">
+<h2>Timeline</h2>
+{visiblePosts.length === 0 && <p>No posts to show.</p>}
+{visiblePosts.map((post) => (
+<article key={post.id} className="post">
+<div className="post-author">@{post.author}</div>
+<p className="post-content">{post.content}</p
+    <span>@{u.username}</span>
+<button
+className={`follow-btn ${isFollowing ? "unfollow" : "follow"}`}
+onClick={() => toggleFollow(u.username)}
+>
+{isFollowing ? "Unfollow" : "Follow"}
+</button>
+</div>
+);
+})}
+</section>
